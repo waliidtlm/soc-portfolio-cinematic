@@ -42,7 +42,7 @@ export default function Projects() {
     const el = scroller.current;
     if (!el) return;
     const card = el.children[0] as HTMLElement | undefined;
-    const stride = card ? card.offsetWidth + 20 : el.clientWidth * 0.8;
+    const stride = card ? card.offsetWidth + 32 : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * stride, behavior: "smooth" });
   };
 
@@ -67,7 +67,7 @@ export default function Projects() {
             type="button"
             aria-label="Previous projects"
             onClick={() => nudge(-1)}
-            className={`absolute -left-3 top-[42%] z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
+            className={`absolute -left-3 top-1/2 -translate-y-1/2 z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
               atStart ? "pointer-events-none opacity-0" : "opacity-100"
             }`}
           >
@@ -77,7 +77,7 @@ export default function Projects() {
             type="button"
             aria-label="Next projects"
             onClick={() => nudge(1)}
-            className={`absolute -right-3 top-[42%] z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
+            className={`absolute -right-3 top-1/2 -translate-y-1/2 z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
               atEnd ? "pointer-events-none opacity-0" : "opacity-100"
             }`}
           >
@@ -87,7 +87,7 @@ export default function Projects() {
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-8 overflow-x-auto px-10 py-12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {projects.map((p) => (
               <div key={p.title} className="w-[290px] shrink-0 snap-start sm:w-[340px]">

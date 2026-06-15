@@ -54,6 +54,7 @@ export type Project = {
   impact: string;
   tech: string[];
   image: string;
+  href?: string; // optional external/case-study link; falls back to "#"
 };
 
 export const projects: Project[] = [
