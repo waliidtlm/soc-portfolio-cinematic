@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, MotionValue } from "framer-motion";
 import { ArrowUpRight, Activity, Radar, Workflow, Crosshair } from "lucide-react";
 import type { Project } from "@/lib/data";
 
@@ -29,6 +29,21 @@ export default function ProjectCard({ project }: { project: Project }) {
   const rotateX = useTransform(springY, [-0.5, 0.5], ["13deg", "-13deg"]);
   const rotateY = useTransform(springX, [-0.5, 0.5], ["-13deg", "13deg"]);
 
+  // Halo shadow shifts opposite to tilt (simulates a fixed light source above).
+  // Lives on a sibling element that's bigger than the card so the bloom
+  // visibly extends beyond the card edges.
+  const haloShadow = useTransform(
+    [springX, springY] as [MotionValue<number>, MotionValue<number>],
+    ([x, y]: number[]) => {
+      const ox = -x * 28;
+      const oy = y * 28 + 24;
+      return [
+        `${ox}px ${oy}px 48px 6px rgba(20,50,130,0.65)`,
+        `${ox * 0.4}px ${oy * 0.4}px 24px 3px rgba(70,110,220,0.45)`,
+      ].join(", ");
+    }
+  );
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { width, height, left, top } = e.currentTarget.getBoundingClientRect();
     mouseX.set((e.clientX - left) / width - 0.5);
@@ -46,25 +61,17 @@ export default function ProjectCard({ project }: { project: Project }) {
       onMouseLeave={handleMouseLeave}
       className="group relative h-[26rem] w-full [perspective:1100px]"
     >
-      {/* Floating halo — the dark-theme equivalent of a light-theme drop
-          shadow. A neutral shadow is invisible on dark, so we bloom a soft
-          luminous box-shadow OUTWARD from the card edges (the bright part
-          renders outside the card, unlike a radial fill the card would hide).
-          Lives behind the tilting card so it reads as a cast glow. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-2xl opacity-70 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          boxShadow:
-            "0 16px 40px -8px rgba(70,110,220,0.55), 0 0 30px -2px rgba(135,170,255,0.45)",
-        }}
-      />
+      {/* Halo: bigger than the card (-inset-4) so the shadow bloom
+          extends visibly past the card edges. Tilts with the card so
+          the shadow shifts correctly as the card rotates. */}
       <motion.div
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
+        aria-hidden
+        style={{ rotateX, rotateY, boxShadow: haloShadow }}
+        className="pointer-events-none absolute -inset-4 rounded-3xl"
+      />
+
+      <motion.div
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
         className="glass relative h-full w-full overflow-hidden rounded-2xl [backface-visibility:hidden]"
       >
         {/* Background: fallback mock dashboard + real screenshot */}

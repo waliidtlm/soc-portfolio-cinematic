@@ -42,7 +42,7 @@ export default function Projects() {
     const el = scroller.current;
     if (!el) return;
     const card = el.children[0] as HTMLElement | undefined;
-    const stride = card ? card.offsetWidth + 32 : el.clientWidth * 0.8;
+    const stride = card ? card.offsetWidth + 56 : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * stride, behavior: "smooth" });
   };
 
@@ -87,7 +87,7 @@ export default function Projects() {
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-8 overflow-x-auto px-10 py-12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-14 overflow-x-auto pl-24 pr-10 py-24 scroll-pl-24 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
           >
             {projects.map((p) => (
               <div key={p.title} className="w-[290px] shrink-0 snap-start sm:w-[340px]">
