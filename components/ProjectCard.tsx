@@ -59,7 +59,7 @@ export default function ProjectCard({ project }: { project: Project }) {
     <div
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="group relative h-[26rem] w-full [perspective:1100px]"
+      className="group relative h-104 w-full perspective-[1100px]"
     >
       {/* Halo: bigger than the card (-inset-4) so the shadow bloom
           extends visibly past the card edges. Tilts with the card so
@@ -72,7 +72,7 @@ export default function ProjectCard({ project }: { project: Project }) {
 
       <motion.div
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="glass relative h-full w-full overflow-hidden rounded-2xl [backface-visibility:hidden]"
+        className="glass relative h-full w-full overflow-hidden rounded-2xl backface-hidden"
       >
         {/* Background: fallback mock dashboard + real screenshot */}
         <div
@@ -81,7 +81,7 @@ export default function ProjectCard({ project }: { project: Project }) {
             background: `radial-gradient(120% 100% at 50% 0%, ${cat.from}33, transparent 60%), linear-gradient(160deg, #0c1426, #070b16)`,
           }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(120,160,230,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,160,230,0.06)_1px,transparent_1px)] bg-[length:26px_26px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(120,160,230,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,160,230,0.06)_1px,transparent_1px)] bg-size-[26px_26px]" />
         <Icon
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10"
           size={110}
@@ -92,7 +92,7 @@ export default function ProjectCard({ project }: { project: Project }) {
           style={{ backgroundImage: `url('${project.image}')` }}
         />
         {/* Contrast gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/70" />
 
         {/* Category badge (top-left) */}
         <span

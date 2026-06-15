@@ -87,10 +87,10 @@ export default function Projects() {
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-14 overflow-x-auto pl-24 pr-10 py-24 scroll-pl-24 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-14 overflow-x-auto pl-24 pr-10 py-24 scroll-pl-24 scrollbar-none"
           >
             {projects.map((p) => (
-              <div key={p.title} className="w-[290px] shrink-0 snap-start sm:w-[340px]">
+              <div key={p.title} className="w-72.5 shrink-0 snap-start sm:w-85">
                 <ProjectCard project={p} />
               </div>
             ))}
