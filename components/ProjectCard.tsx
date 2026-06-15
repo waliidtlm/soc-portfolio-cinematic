@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform, MotionValue } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight, Activity, Radar, Workflow, Crosshair } from "lucide-react";
 import type { Project } from "@/lib/data";
 
@@ -33,7 +33,7 @@ export default function ProjectCard({ project }: { project: Project }) {
   // Lives on a sibling element that's bigger than the card so the bloom
   // visibly extends beyond the card edges.
   const haloShadow = useTransform(
-    [springX, springY] as [MotionValue<number>, MotionValue<number>],
+    [springX, springY],
     ([x, y]: number[]) => {
       const ox = -x * 28;
       const oy = y * 28 + 24;
