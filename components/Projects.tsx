@@ -15,24 +15,24 @@ export default function Projects() {
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
-  // Track scroll progress through the Projects section.
-  // offset ["start end", "end start"] = full range while section is in viewport.
+  // Track scroll progress from section-top-at-viewport-top → section-bottom-at-viewport-bottom.
+  // The section is min-h-[200vh] so this range spans ~100vh of pinned scroll.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"],
+    offset: ["start start", "end end"],
   });
 
-  // clipPath animates from fully clipped (bottom) to revealed as section enters.
-  const bgReveal = useTransform(
-    scrollYProgress,
-    [0, 0.4],
-    ["inset(0% 0% 100% 0%)", "inset(0% 0% 0% 0%)"]
-  );
+  // City background: zooms from 110% down to 100% as section opens, then drifts upward.
+  const bgScale = useTransform(scrollYProgress, [0, 0.4], [1.1, 1.0]);
+  const bgOpacity = useTransform(scrollYProgress, [0, 0.18], [0, 1]);
+  const bgYRaw = useTransform(scrollYProgress, [0, 1], ["0%", "-14%"]);
+  // Spring gives the parallax a weighted, cinematic lag.
+  const bgY = useSpring(bgYRaw, { stiffness: 55, damping: 22 });
 
-  // Parallax: city drifts from 15% below to -15% above through the full scroll range.
-  // Spring adds smooth lag so it feels weightier than a direct transform.
-  const bgYRaw = useTransform(scrollYProgress, [0, 1], ["15%", "-15%"]);
-  const bgY = useSpring(bgYRaw, { stiffness: 80, damping: 30 });
+  // Content: slides up and fades in after the city has established itself.
+  const contentOpacity = useTransform(scrollYProgress, [0.12, 0.35], [0, 1]);
+  const contentYRaw = useTransform(scrollYProgress, [0.12, 0.35], [50, 0]);
+  const contentY = useSpring(contentYRaw, { stiffness: 80, damping: 22 });
 
   const update = useCallback(() => {
     const el = scroller.current;
@@ -45,10 +45,7 @@ export default function Projects() {
     let min = Infinity;
     cards.forEach((c, i) => {
       const d = Math.abs(c.offsetLeft - el.offsetLeft - scrollLeft);
-      if (d < min) {
-        min = d;
-        nearest = i;
-      }
+      if (d < min) { min = d; nearest = i; }
     });
     setActive(nearest);
   }, []);
@@ -74,79 +71,94 @@ export default function Projects() {
   };
 
   return (
-    <section id="projects" ref={sectionRef} className="relative z-10 isolate py-24">
-      {/* City backdrop — clips upward into view as section enters the viewport,
-          then parallaxes at a slower rate than the page for depth. */}
-      <motion.div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/images/hero-city-close.png')",
-          clipPath: bgReveal,
-          y: bgY,
-        }}
-      />
-      {/* Gradient veil — darkens top/bottom so headers and cards stay readable */}
-      <div className="absolute inset-0 -z-10 bg-linear-to-b from-bg/85 via-bg/50 to-bg/85" />
+    // min-h-[200vh]: gives 100vh of extra scroll space so the sticky panel
+    // stays pinned long enough for the city reveal + content fade-in to finish.
+    <section id="projects" ref={sectionRef} className="relative z-10 min-h-[200vh]">
 
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <SectionHeader
-          kicker="Featured Projects"
-          title="Projects"
-          blurb="A selection of real-world projects focused on detection engineering, threat analysis, and automation."
-          link={{ label: "View All Projects", href: "#projects" }}
-        />
+      {/* ── Sticky panel: pins to viewport top while section scrolls ── */}
+      <div className="sticky top-0 h-dvh">
 
-        <Reveal>
-          <div className="relative">
-            <button
-              type="button"
-              aria-label="Previous projects"
-              onClick={() => nudge(-1)}
-              className={`absolute -left-3 top-1/2 -translate-y-1/2 z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
-                atStart ? "pointer-events-none opacity-0" : "opacity-100"
-              }`}
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              type="button"
-              aria-label="Next projects"
-              onClick={() => nudge(1)}
-              className={`absolute -right-3 top-1/2 -translate-y-1/2 z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
-                atEnd ? "pointer-events-none opacity-0" : "opacity-100"
-              }`}
-            >
-              <ChevronRight size={20} />
-            </button>
+        {/* City backdrop — overflow-hidden clips the parallax movement */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: "url('/images/hero-city-close.png')",
+              scale: bgScale,
+              opacity: bgOpacity,
+              y: bgY,
+            }}
+          />
+          {/* Cinematic vignette: dark at edges, semi-transparent in the middle */}
+          <div className="absolute inset-0 bg-linear-to-b from-bg/80 via-bg/35 to-bg/80" />
+        </div>
 
-            <div
-              ref={scroller}
-              onScroll={update}
-              className="flex snap-x snap-mandatory gap-14 overflow-x-auto pl-24 pr-10 py-24 scroll-pl-24 scrollbar-none"
-            >
-              {projects.map((p) => (
-                <div key={p.title} className="w-72.5 shrink-0 snap-start sm:w-85">
-                  <ProjectCard project={p} />
+        {/* Content layer — no overflow-hidden so the carousel can scroll freely */}
+        <motion.div
+          className="absolute inset-0 flex flex-col justify-center py-16 overflow-visible"
+          style={{ opacity: contentOpacity, y: contentY }}
+        >
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
+            <SectionHeader
+              kicker="Featured Projects"
+              title="Projects"
+              blurb="A selection of real-world projects focused on detection engineering, threat analysis, and automation."
+              link={{ label: "View All Projects", href: "#projects" }}
+            />
+
+            <Reveal>
+              <div className="relative">
+                <button
+                  type="button"
+                  aria-label="Previous projects"
+                  onClick={() => nudge(-1)}
+                  className={`absolute -left-3 top-1/2 -translate-y-1/2 z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
+                    atStart ? "pointer-events-none opacity-0" : "opacity-100"
+                  }`}
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next projects"
+                  onClick={() => nudge(1)}
+                  className={`absolute -right-3 top-1/2 -translate-y-1/2 z-20 grid h-11 w-11 place-items-center rounded-full text-white transition-all duration-300 glass-solid hover:border-white/30 ${
+                    atEnd ? "pointer-events-none opacity-0" : "opacity-100"
+                  }`}
+                >
+                  <ChevronRight size={20} />
+                </button>
+
+                <div
+                  ref={scroller}
+                  onScroll={update}
+                  className="flex snap-x snap-mandatory gap-14 overflow-x-auto pl-24 pr-10 py-24 scroll-pl-24 scrollbar-none"
+                >
+                  {projects.map((p) => (
+                    <div key={p.title} className="w-72.5 shrink-0 snap-start sm:w-85">
+                      <ProjectCard project={p} />
+                    </div>
+                  ))}
                 </div>
+              </div>
+            </Reveal>
+
+            <div className="mt-7 flex justify-center gap-2">
+              {projects.map((p, i) => (
+                <button
+                  key={p.title}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={`Go to ${p.title}`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    active === i ? "w-7 bg-cyan" : "w-1.5 bg-white/20 hover:bg-white/40"
+                  }`}
+                />
               ))}
             </div>
           </div>
-        </Reveal>
-
-        <div className="mt-7 flex justify-center gap-2">
-          {projects.map((p, i) => (
-            <button
-              key={p.title}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`Go to ${p.title}`}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                active === i ? "w-7 bg-cyan" : "w-1.5 bg-white/20 hover:bg-white/40"
-              }`}
-            />
-          ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
