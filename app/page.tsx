@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroExpand from "@/components/HeroExpand";
+import Manifesto from "@/components/Manifesto";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import SocOperations from "@/components/SocOperations";
@@ -12,8 +13,9 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="relative overflow-hidden">
+      <main className="relative overflow-x-clip">
         <HeroExpand />
+        <Manifesto />
         <Projects />
         <Skills />
         <SocOperations />
