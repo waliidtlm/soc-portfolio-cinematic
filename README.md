@@ -16,8 +16,8 @@ npm run build    # production build
 
 ## Sections
 
-Navbar · Hero (+ live telemetry widgets) · Projects (carousel) · Skills (network graph) ·
-SOC Operations (dashboard) · Certifications · About (+ terminal) · Contact · Footer.
+Navbar · Hero (+ live telemetry widgets) · Manifesto · Projects (selected-work rows) ·
+Certifications · About (+ terminal) · Contact · Footer.
 
 ## Fill in your content
 

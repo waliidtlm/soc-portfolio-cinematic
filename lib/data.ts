@@ -19,30 +19,9 @@ export const profile = {
 export const navLinks = [
   { label: "Home", href: "#home" },
   { label: "Work", href: "#projects" },
-  { label: "Skills", href: "#skills" },
   { label: "Certifications", href: "#certifications" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
-];
-
-// --- Hero floating widgets ---------------------------------------------------
-export const liveFeed = [
-  { value: "12.5M", label: "Events Analyzed" },
-  { value: "842", label: "Alerts Generated" },
-  { value: "128", label: "Incidents Resolved" },
-];
-
-export const threatActivity = {
-  level: "LOW",
-  // normalized 0..1 sample points for the mini sparkline
-  series: [0.3, 0.45, 0.35, 0.5, 0.42, 0.38, 0.55, 0.4, 0.34, 0.46, 0.3, 0.28],
-};
-
-export const topThreatTypes = [
-  { label: "Phishing", weight: 0.92 },
-  { label: "Brute Force", weight: 0.7 },
-  { label: "Initial Access", weight: 0.55 },
-  { label: "Persistence", weight: 0.38 },
 ];
 
 // --- Projects ----------------------------------------------------------------
@@ -94,66 +73,6 @@ export const projects: Project[] = [
     tech: ["Splunk", "KQL", "ATT&CK", "Sigma"],
     image: "/images/projects/detection-lab.jpg",
   },
-];
-
-// --- Skills (network graph) --------------------------------------------------
-export type SkillCluster = {
-  key: string;
-  title: string;
-  icon: string; // lucide icon name, mapped in component
-  tools: string[];
-};
-
-export const skillClusters: SkillCluster[] = [
-  { key: "siem", title: "SIEM", icon: "Activity", tools: ["Splunk", "Elastic Stack", "Microsoft Sentinel", "QRadar"] },
-  { key: "detection", title: "Detection Engineering", icon: "Crosshair", tools: ["Sigma", "KQL", "DetectIQ", "YARA"] },
-  { key: "intel", title: "Threat Intelligence", icon: "Radar", tools: ["MISP", "OpenCTI", "Threat Feeds", "VirusTotal"] },
-  { key: "edr", title: "EDR / XDR", icon: "ShieldCheck", tools: ["CrowdStrike", "Microsoft Defender", "Wazuh"] },
-  { key: "ir", title: "Incident Response", icon: "Siren", tools: ["TheHive", "Cortex", "Shuffle", "Response Actions"] },
-  { key: "cloud", title: "Cloud Security", icon: "Cloud", tools: ["AWS", "Azure", "Google Cloud"] },
-];
-
-// --- SOC Operations dashboard ------------------------------------------------
-export type SocStat = {
-  label: string;
-  value: number;
-  display?: string;
-  suffix?: string;
-  delta?: string;
-  trend?: "up" | "down";
-  note?: string;
-  series: number[];
-  color: string; // css var token
-};
-
-export const socStats: SocStat[] = [
-  { label: "Alerts Investigated", value: 1247, delta: "+18%", trend: "up", series: [12, 18, 14, 22, 19, 26, 24, 30, 28, 34], color: "var(--color-ok)" },
-  { label: "Mean Time to Respond", value: 18, suffix: "m", delta: "-32%", trend: "down", series: [40, 36, 38, 30, 28, 24, 26, 21, 19, 18], color: "var(--color-med)" },
-  { label: "Detections Fired", value: 2341, delta: "+20%", trend: "up", series: [20, 24, 22, 30, 28, 36, 40, 44, 48, 52], color: "var(--color-cyan)" },
-  { label: "Threat Feeds", value: 14, note: "Active & Updating", series: [], color: "var(--color-accent-bright)" },
-  { label: "Incidents Handled", value: 83, delta: "+12%", trend: "up", series: [4, 6, 5, 8, 7, 9, 8, 11, 10, 12], color: "#c084fc" },
-];
-
-export const threatFeedSources = ["MISP", "AbuseIPDB", "AlienVault", "OTX"];
-
-export const severity = [
-  { label: "High", value: 12, color: "var(--color-high)" },
-  { label: "Medium", value: 34, color: "var(--color-med)" },
-  { label: "Low", value: 54, color: "var(--color-low)" },
-];
-
-export const mitreTechniques = [
-  { label: "Initial Access", value: 327 },
-  { label: "Execution", value: 278 },
-  { label: "Persistence", value: 184 },
-  { label: "Credential Access", value: 132 },
-];
-
-export const recentAlerts = [
-  { time: "10:24:15", name: "Suspicious PowerShell Activity", severity: "High" as const },
-  { time: "10:18:42", name: "Multiple Failed Logins", severity: "Medium" as const },
-  { time: "10:12:09", name: "Unusual Data Exfiltration Pattern", severity: "High" as const },
-  { time: "10:05:33", name: "New Admin User Created", severity: "Low" as const },
 ];
 
 // --- Certifications ----------------------------------------------------------
