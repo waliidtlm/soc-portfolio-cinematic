@@ -21,6 +21,9 @@ interface ScrollExpandMediaProps {
   scrollToExpand?: string;
   textBlend?: boolean;
   children?: ReactNode;
+  // When provided, replaces the default title/date overlay. Receives `release`,
+  // which fully expands the media and ends the scroll-hijack (for CTA links).
+  overlay?: (release: () => void) => ReactNode;
 }
 
 const ScrollExpandMedia = ({
@@ -33,6 +36,7 @@ const ScrollExpandMedia = ({
   scrollToExpand,
   textBlend,
   children,
+  overlay,
 }: ScrollExpandMediaProps) => {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [showContent, setShowContent] = useState<boolean>(false);
@@ -167,6 +171,15 @@ const ScrollExpandMedia = ({
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
 
+  // Fully expand the media and end the scroll-hijack — used by CTA links so an
+  // in-hero anchor can navigate past the pinned hero.
+  const release = (): void => {
+    setScrollProgress(1);
+    setMediaFullyExpanded(true);
+    setShowContent(true);
+  };
+  const overlayOpacity = Math.max(0, 1 - scrollProgress * 1.8);
+
   return (
     <div
       ref={sectionRef}
@@ -277,44 +290,58 @@ const ScrollExpandMedia = ({
                   </div>
                 )}
 
-                <div className='flex flex-col items-center text-center relative z-10 mt-4 transition-none'>
-                  {date && (
-                    <p
-                      className='text-2xl text-blue-200'
-                      style={{ transform: `translateX(-${textTranslateX}vw)` }}
-                    >
-                      {date}
-                    </p>
-                  )}
-                  {scrollToExpand && (
-                    <p
-                      className='text-blue-200 font-medium text-center'
-                      style={{ transform: `translateX(${textTranslateX}vw)` }}
-                    >
-                      {scrollToExpand}
-                    </p>
-                  )}
-                </div>
+                {!overlay && (
+                  <div className='flex flex-col items-center text-center relative z-10 mt-4 transition-none'>
+                    {date && (
+                      <p
+                        className='text-2xl text-blue-200'
+                        style={{ transform: `translateX(-${textTranslateX}vw)` }}
+                      >
+                        {date}
+                      </p>
+                    )}
+                    {scrollToExpand && (
+                      <p
+                        className='text-blue-200 font-medium text-center'
+                        style={{ transform: `translateX(${textTranslateX}vw)` }}
+                      >
+                        {scrollToExpand}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div
-                className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${
-                  textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
-                }`}
-              >
-                <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none'
-                  style={{ transform: `translateX(-${textTranslateX}vw)` }}
+              {overlay ? (
+                <div
+                  className='w-full relative z-10 transition-opacity duration-200'
+                  style={{
+                    opacity: overlayOpacity,
+                    pointerEvents: scrollProgress > 0.35 ? 'none' : 'auto',
+                  }}
                 >
-                  {firstWord}
-                </motion.h2>
-                <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none'
-                  style={{ transform: `translateX(${textTranslateX}vw)` }}
+                  {overlay(release)}
+                </div>
+              ) : (
+                <div
+                  className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${
+                    textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
+                  }`}
                 >
-                  {restOfTitle}
-                </motion.h2>
-              </div>
+                  <motion.h2
+                    className='text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none'
+                    style={{ transform: `translateX(-${textTranslateX}vw)` }}
+                  >
+                    {firstWord}
+                  </motion.h2>
+                  <motion.h2
+                    className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none'
+                    style={{ transform: `translateX(${textTranslateX}vw)` }}
+                  >
+                    {restOfTitle}
+                  </motion.h2>
+                </div>
+              )}
             </div>
 
             {children && (

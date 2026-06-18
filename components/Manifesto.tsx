@@ -8,6 +8,7 @@ import {
   useReducedMotion,
   type MotionValue,
 } from "framer-motion";
+import ProfileCard from "./ProfileCard";
 
 const LINES = [
   { lead: "Every", body: "alert tells a", accent: "story." },
@@ -16,7 +17,7 @@ const LINES = [
 ] as const;
 
 const lineClass =
-  "font-display font-extrabold tracking-tight leading-[1.08] text-[clamp(2rem,5.5vw,4.5rem)]";
+  "font-display font-extrabold tracking-tight leading-[1.08] text-[clamp(1.75rem,4vw,3.5rem)]";
 
 function Line({ i }: { i: number }) {
   const l = LINES[i];
@@ -31,7 +32,7 @@ function Line({ i }: { i: number }) {
 
 function Paragraph() {
   return (
-    <p className="mt-2 max-w-2xl font-sans text-[clamp(1.05rem,1.65vw,1.25rem)] leading-relaxed text-dim">
+    <p className="mt-2 max-w-xl font-sans text-[clamp(1rem,1.4vw,1.15rem)] leading-relaxed text-dim">
       I operate at the intersection of raw telemetry and decisive action —
       engineering <b className="font-semibold text-white">detection logic</b>,
       triaging <b className="font-semibold text-white">real-world threats</b>,
@@ -42,92 +43,98 @@ function Paragraph() {
   );
 }
 
+const layout =
+  "mx-auto grid max-w-[1700px] grid-cols-1 items-center gap-12 px-[4vw] py-20 lg:grid-cols-[1fr_auto] lg:gap-24";
+
 export default function Manifesto() {
   const reduced = useReducedMotion();
-  const pinRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Entrance: tracks section rising from bottom of viewport → top of viewport
-  const { scrollYProgress: enterProgress } = useScroll({
-    target: pinRef,
-    offset: ["start end", "start start"],
+  // Scroll-tied reveal: progresses as the section travels up through the
+  // viewport. No pin, no scroll-hijack — just maps scroll position to reveal.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 0.9", "center 0.55"],
   });
 
-  // Pin: tracks the 30vh scroll window while section is sticky
-  // pinProgress 0→1 spans the full 130vh section; pin releases at 30/130 ≈ 0.231
-  const { scrollYProgress: pinProgress } = useScroll({
-    target: pinRef,
-    offset: ["start start", "end start"],
-  });
+  // Each item reveals over its own slice of the scroll window.
+  const kickerO = useTransform(scrollYProgress, [0.0, 0.12], [0, 1]);
+  const kickerY = useTransform(scrollYProgress, [0.0, 0.12], [24, 0]);
 
-  // Black panel rises from fully below → fully in place when pin starts
-  const bgY = useTransform(enterProgress, [0, 1], ["100%", "0%"]);
+  const o1 = useTransform(scrollYProgress, [0.12, 0.3], [0, 1]);
+  const y1 = useTransform(scrollYProgress, [0.12, 0.3], [28, 0]);
+  const o2 = useTransform(scrollYProgress, [0.3, 0.48], [0, 1]);
+  const y2 = useTransform(scrollYProgress, [0.3, 0.48], [28, 0]);
+  const o3 = useTransform(scrollYProgress, [0.48, 0.66], [0, 1]);
+  const y3 = useTransform(scrollYProgress, [0.48, 0.66], [28, 0]);
 
-  // Text reveals scroll-driven during the pin — each item appears as you scroll.
-  // All ranges fit within [0, 0.23] (the actual pin window) so nothing is skipped.
-  const titleO = useTransform(pinProgress, [0.00, 0.04], [0, 1]);
-  const titleY = useTransform(pinProgress, [0.00, 0.04], [24, 0]);
+  const oEnd = useTransform(scrollYProgress, [0.66, 0.82], [0, 1]);
+  const yEnd = useTransform(scrollYProgress, [0.66, 0.82], [28, 0]);
 
-  const o1    = useTransform(pinProgress, [0.04, 0.09], [0, 1]);
-  const y1    = useTransform(pinProgress, [0.04, 0.09], [24, 0]);
-  const o2    = useTransform(pinProgress, [0.09, 0.14], [0, 1]);
-  const y2    = useTransform(pinProgress, [0.09, 0.14], [24, 0]);
-  const o3    = useTransform(pinProgress, [0.14, 0.19], [0, 1]);
-  const y3    = useTransform(pinProgress, [0.14, 0.19], [24, 0]);
-
-  const oEnd  = useTransform(pinProgress, [0.19, 0.23], [0, 1]);
-  const yEnd  = useTransform(pinProgress, [0.19, 0.23], [24, 0]);
+  // Card slides in from the right alongside the first lines.
+  const cardO = useTransform(scrollYProgress, [0.15, 0.45], [0, 1]);
+  const cardX = useTransform(scrollYProgress, [0.15, 0.45], [56, 0]);
 
   const opacities = [o1, o2, o3];
   const ys = [y1, y2, y3];
 
+  // Reduced motion: render everything static, no scroll animation.
   if (reduced) {
     return (
       <section id="manifesto" className="relative w-full bg-black">
-        <div className="flex flex-col justify-center px-[5vw] py-24">
-          <p className="mb-6 font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-            The Analyst's Mindset
-          </p>
-          {LINES.map((_, i) => (
-            <Line key={i} i={i} />
-          ))}
-          <div className="my-7 h-px w-50 bg-linear-to-r from-cyan to-transparent" />
-          <Paragraph />
+        <div className={layout}>
+          <div className="text-left">
+            <p className="mb-6 font-mono text-xs uppercase tracking-[0.25em] text-cyan">
+              The Analyst&apos;s Mindset
+            </p>
+            {LINES.map((_, i) => (
+              <Line key={i} i={i} />
+            ))}
+            <div className="my-7 h-px w-50 bg-linear-to-r from-cyan to-transparent" />
+            <Paragraph />
+          </div>
+          <div className="flex justify-center lg:justify-end">
+            <ProfileCard />
+          </div>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="manifesto" className="relative w-full">
-      <div ref={pinRef} className="relative h-[130vh]">
-        {/* overflow-hidden clips the rising panel to the sticky viewport bounds */}
-        <div className="sticky top-0 h-svh overflow-hidden">
-          <motion.div
-            style={{ y: bgY as MotionValue<string> }}
-            className="absolute inset-0 flex flex-col justify-center bg-black px-[5vw]"
+    <section id="manifesto" ref={sectionRef} className="relative w-full bg-black">
+      <div className={layout}>
+        {/* Left — manifesto text, scroll-tied line-by-line reveal */}
+        <div className="text-left">
+          <motion.p
+            style={{ opacity: kickerO as MotionValue<number>, y: kickerY as MotionValue<number> }}
+            className="mb-6 font-mono text-xs uppercase tracking-[0.25em] text-cyan"
           >
-            <motion.p
-              style={{ opacity: titleO as MotionValue<number>, y: titleY as MotionValue<number> }}
-              className="mb-6 font-mono text-xs uppercase tracking-[0.25em] text-cyan"
+            The Analyst&apos;s Mindset
+          </motion.p>
+
+          {LINES.map((_, i) => (
+            <motion.div
+              key={i}
+              style={{ opacity: opacities[i] as MotionValue<number>, y: ys[i] as MotionValue<number> }}
             >
-              The Analyst's Mindset
-            </motion.p>
-
-            {LINES.map((_, i) => (
-              <motion.div
-                key={i}
-                style={{ opacity: opacities[i] as MotionValue<number>, y: ys[i] as MotionValue<number> }}
-              >
-                <Line i={i} />
-              </motion.div>
-            ))}
-
-            <motion.div style={{ opacity: oEnd as MotionValue<number>, y: yEnd as MotionValue<number> }}>
-              <div className="my-7 h-px w-50 bg-linear-to-r from-cyan to-transparent" />
-              <Paragraph />
+              <Line i={i} />
             </motion.div>
+          ))}
+
+          <motion.div style={{ opacity: oEnd as MotionValue<number>, y: yEnd as MotionValue<number> }}>
+            <div className="my-7 h-px w-50 bg-linear-to-r from-cyan to-transparent" />
+            <Paragraph />
           </motion.div>
         </div>
+
+        {/* Right — personal card, slides in from the right */}
+        <motion.div
+          style={{ opacity: cardO as MotionValue<number>, x: cardX as MotionValue<number> }}
+          className="flex justify-center lg:justify-end"
+        >
+          <ProfileCard />
+        </motion.div>
       </div>
     </section>
   );
