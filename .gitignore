@@ -32,5 +32,8 @@ next-env.d.ts
 # temp dev screenshots
 _shot*.png
 
+# local design references (saved pages, inspiration)
+/reference/
+
 # logs
 *.log
